@@ -1,6 +1,6 @@
 import { Avatar, Box, Drawer, DrawerContent, DrawerOverlay, Flex } from "@chakra-ui/react";
 import { Icon, IconButton, Input, InputGroup, InputLeftElement, ChakraProps } from "@chakra-ui/react"
-import { Text, useColorModeValue, useDisclosure, Button } from "@chakra-ui/react"
+import { Text, useColorModeValue, useDisclosure, Button, useToast } from "@chakra-ui/react"
 import { FaBell, FaSearch } from "react-icons/fa";
 import { BiSolidMessageSquareDetail, BiSolidUserCircle } from "react-icons/bi"
 import { FiMenu, FiSearch } from "react-icons/fi";
@@ -29,6 +29,7 @@ export const Layout = () => {
     const { user } = useAuth();
     const [query, setQuery] = useState('')
     const navigate = useNavigate()
+    const toast = useToast()
 
     const handleLogout = () => {
         signOut(auth)
@@ -120,12 +121,20 @@ export const Layout = () => {
                 <Link to={`/messages`}>
                     <NavItem icon={BiSolidMessageSquareDetail}>Messages</NavItem>
                 </Link>
-                <NavItem onClick={creator.onOpen} icon={IoIosAddCircle}>Create</NavItem>
-                <Link to={`/user/${user?.id}`}>
-                    <NavItem icon={BiSolidUserCircle}>Profile</NavItem>
-                </Link>
+                <NavItem onClick={user ? creator.onOpen : () => toast({
+                    title: 'Unauthorized',
+                    description: "Please login first.",
+                    status: 'error',
+                    duration: 9000,
+                    isClosable: true,
+                })} icon={IoIosAddCircle}>Create</NavItem>
                 {user && (
-                    <NavItem icon={BiLogOutCircle} onClick={handleLogout}>Logout</NavItem>
+                    <>
+                        <Link to={`/user/${user?.id}`}>
+                            <NavItem icon={BiSolidUserCircle}>Profile</NavItem>
+                        </Link>
+                        <NavItem icon={BiLogOutCircle} onClick={handleLogout}>Logout</NavItem>
+                    </>
                 )}
             </Flex>
         </Box>
