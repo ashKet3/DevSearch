@@ -8,14 +8,16 @@ import { useFollow } from "../hooks/useFollow";
 import { BsBroadcast } from "react-icons/bs"
 import { AiFillLike, AiFillDislike } from "react-icons/ai"
 import { Comments } from "../components/Comments";
+import { useAuth } from "../hooks/useAuth";
 
 export const Project = () => {
     const { slug } = useParams()
     const { getUserData } = useFollow(undefined)
     const [data, setData] = useState<IProject | null>(null)
     const [admin, setAdmin] = useState<null | IProfile>(null)
-    const isLiked = data?.likes.includes(data?.admin)
-    const isDisliked = data?.dislikes.includes(data?.admin)
+    const { user } = useAuth()
+    const isLiked = data?.likes.includes(`${user?.id}`)
+    const isDisliked = data?.dislikes.includes(`${user?.id}`)
 
     useMemo(() => {
         const fetchData = async () => {
@@ -129,24 +131,26 @@ export const Project = () => {
                         </Link>
                     </Box>
 
-                    <Flex mt={4} gap={3} justifyContent="flex-end">
-                        <IconButton
-                            aria-label='Like'
-                            size='sm'
-                            fontSize='lg'
-                            icon={<AiFillLike />}
-                            onClick={handleLike}
-                            color={isLiked ? 'teal.300' : 'unset'}
-                        />
-                        <IconButton
-                            aria-label='Dislike'
-                            size='sm'
-                            fontSize='lg'
-                            icon={<AiFillDislike />}
-                            onClick={handleDislike}
-                            color={isDisliked ? 'teal.300' : 'unset'}
-                        />
-                    </Flex>
+                    {user && (
+                        <Flex mt={4} gap={3} justifyContent="flex-end">
+                            <IconButton
+                                aria-label='Like'
+                                size='sm'
+                                fontSize='lg'
+                                icon={<AiFillLike />}
+                                onClick={handleLike}
+                                color={isLiked ? 'teal.300' : 'unset'}
+                            />
+                            <IconButton
+                                aria-label='Dislike'
+                                size='sm'
+                                fontSize='lg'
+                                icon={<AiFillDislike />}
+                                onClick={handleDislike}
+                                color={isDisliked ? 'teal.300' : 'unset'}
+                            />
+                        </Flex>
+                    )}
                 </Box>
                 <Box
                     display="flex"

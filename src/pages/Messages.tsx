@@ -10,7 +10,7 @@ import { useAuth } from "../hooks/useAuth"
 import { database } from "../libs/firebase"
 import { Message } from "../models/types"
 import { generateChatId } from "../libs/utils"
-import { Input, InputGroup, Button } from "@chakra-ui/react"
+import { Input, InputGroup, Button, Heading } from "@chakra-ui/react"
 import { Card, CardHeader, CardBody, CardFooter } from '@chakra-ui/react'
 import { BsReplyFill, BsX } from 'react-icons/bs'
 import { DocumentData } from "firebase/firestore";
@@ -120,7 +120,18 @@ export const Messages = () => {
                         gap={6}
                         mt={3}
                     >
-                        {followingData?.map((chat: IProfile, index: number) => {
+                        {!user && (
+                            <Box textAlign="center" p={8}>
+                                <Heading mb={4}>You're Not Logged In</Heading>
+                                <Text mb={4}>
+                                    To access this feature, please log in or create an account.
+                                </Text>
+                                <Link to="/auth/login">
+                                    <Button colorScheme="blue">Log In</Button>
+                                </Link>
+                            </Box>
+                        )}
+                        {user && followingData?.map((chat: IProfile, index: number) => {
                             return (
                                 <Link
                                     key={index}

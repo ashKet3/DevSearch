@@ -35,6 +35,7 @@ export const Layout = () => {
         signOut(auth)
             .then(() => {
                 console.log("User signed out");
+                window.location.reload();
             })
     }
 

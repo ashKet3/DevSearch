@@ -6,12 +6,14 @@ import { useFollow } from "../hooks/useFollow";
 import { AiFillLike, AiFillDislike } from "react-icons/ai"
 import { firestore } from "../libs/firebase";
 import { doc, updateDoc, arrayUnion, arrayRemove } from "firebase/firestore";
+import { useAuth } from "../hooks/useAuth";
 
 export const Entry = ({ data, variant }: { data: IProject, variant?: string }) => {
     const [admin, setAdmin] = useState<null | IProfile>(null)
     const { getUserData } = useFollow(undefined)
-    const isLiked = data.likes.includes(data.admin)
-    const isDisliked = data.dislikes.includes(data.admin)
+    const { user } = useAuth()
+    const isLiked = data.likes.includes(`${user?.id}`)
+    const isDisliked = data.dislikes.includes(`${user?.id}`)
 
 
     useEffect(() => {
@@ -20,21 +22,22 @@ export const Entry = ({ data, variant }: { data: IProject, variant?: string }) =
             setAdmin(user)
         }
         fetchUser()
-    })
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [data])
 
     const handleLike = async () => {
         const projectRef = doc(firestore, "projects", data.id);
         await updateDoc(projectRef, {
-            likes: arrayUnion(data.admin),
-            dislikes: arrayRemove(data.admin)
+            likes: arrayUnion(user?.id),
+            dislikes: arrayRemove(user?.id)
         });
     };
 
     const handleDislike = async () => {
         const projectRef = doc(firestore, "projects", data.id);
         await updateDoc(projectRef, {
-            dislikes: arrayUnion(data.admin),
-            likes: arrayRemove(data.admin)
+            dislikes: arrayUnion(user?.id),
+            likes: arrayRemove(user?.id)
         });
     };
 
@@ -98,24 +101,26 @@ export const Entry = ({ data, variant }: { data: IProject, variant?: string }) =
             </Box>
 
             <Flex mt="4" justifyContent="space-between">
-                <Flex gap={3}>
-                    <IconButton
-                        aria-label='Like'
-                        size='sm'
-                        fontSize='lg'
-                        icon={<AiFillLike />}
-                        onClick={handleLike}
-                        color={isLiked ? 'teal.300' : 'unset'}
-                    />
-                    <IconButton
-                        aria-label='Dislike'
-                        size='sm'
-                        fontSize='lg'
-                        icon={<AiFillDislike />}
-                        onClick={handleDislike}
-                        color={isDisliked ? 'teal.300' : 'unset'}
-                    />
-                </Flex>
+                {user && (
+                    <Flex gap={3}>
+                        <IconButton
+                            aria-label='Like'
+                            size='sm'
+                            fontSize='lg'
+                            icon={<AiFillLike />}
+                            onClick={handleLike}
+                            color={isLiked ? 'teal.300' : 'unset'}
+                        />
+                        <IconButton
+                            aria-label='Dislike'
+                            size='sm'
+                            fontSize='lg'
+                            icon={<AiFillDislike />}
+                            onClick={handleDislike}
+                            color={isDisliked ? 'teal.300' : 'unset'}
+                        />
+                    </Flex>
+                )}
                 <Link href={`/user/${admin?.id}`}>
                     <Flex alignItems="center" gap={1}>
                         <Avatar

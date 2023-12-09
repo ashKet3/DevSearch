@@ -1,4 +1,4 @@
-import { ChangeEvent, useState, useEffect } from "react";
+import { ChangeEvent, useState } from "react";
 import { Box, Text, Input, Button, Container, VStack, Link } from "@chakra-ui/react";
 import { FormControl, FormLabel, FormErrorMessage, Flex } from "@chakra-ui/react"
 import { createUserWithEmailAndPassword, GoogleAuthProvider, signInWithPopup } from "firebase/auth";
@@ -6,7 +6,6 @@ import { auth, firestore } from "../../libs/firebase";
 import { doc, setDoc } from "firebase/firestore";
 import { User } from "firebase/auth";
 import { useNavigate } from "react-router-dom";
-import { useAuth } from "../../hooks/useAuth";
 import { useToast } from '@chakra-ui/react'
 import { generateRandomUsername } from "../../libs/utils";
 import { BsGoogle } from "react-icons/bs"
@@ -26,11 +25,6 @@ export const Register = () => {
     const [error, setError] = useState<errorFields>({})
     const navigate = useNavigate();
     const toast = useToast()
-    const { user: iuser } = useAuth();
-
-    useEffect(() => {
-        if (iuser) navigate("/")
-    }, [navigate, iuser])
 
     const createProfile = async (user: User) => {
         try {

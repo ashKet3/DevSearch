@@ -1,9 +1,8 @@
-import { useState, ChangeEvent, useEffect } from "react";
+import { useState, ChangeEvent } from "react";
 import { Box, Text, Input, Button, Container, VStack, Link, Flex } from "@chakra-ui/react";
 import { FormControl, FormLabel, FormErrorMessage } from "@chakra-ui/react";
 import { signInWithEmailAndPassword, GoogleAuthProvider, signInWithPopup, } from "firebase/auth";
 import { auth } from "../../libs/firebase";
-import { useAuth } from "../../hooks/useAuth";
 import { BsGoogle } from "react-icons/bs"
 import { useNavigate } from "react-router-dom";
 import { useToast } from '@chakra-ui/react'
@@ -21,11 +20,6 @@ export const Login = () => {
     const [error, setError] = useState<errorFields>({})
     const navigate = useNavigate();
     const toast = useToast()
-    const { user } = useAuth();
-
-    useEffect(() => {
-        if (user) navigate("/")
-    }, [navigate, user])
 
     const handleLogin = () => {
         const { email, password } = endUser;
@@ -64,11 +58,25 @@ export const Login = () => {
         signInWithPopup(auth, provider)
             .then((result) => {
                 const user = result.user;
+                toast({
+                    title: 'Welcome Back, Sunshine!',
+                    description: "You're logged in and ready to shine! 🌻",
+                    status: 'success',
+                    duration: 9000,
+                    isClosable: true,
+                })
                 if (user) {
                     navigate("/")
                 }
             })
             .catch((error) => {
+                toast({
+                    title: 'Oopsie Daisy, Error!',
+                    description: JSON.stringify(error.message),
+                    status: 'error',
+                    duration: 9000,
+                    isClosable: true,
+                })
                 console.log(error);
             });
     };
